@@ -26,11 +26,11 @@ public class PostRepositoryTest {
 	@Test
 	public void test() {
 
-		findByNombreContaining();
+		findByNombreContainingPaginado();
 		
 	}
 
-	private void findByNombreContaining(){
+	private void findByNombreContainingPaginado(){
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		

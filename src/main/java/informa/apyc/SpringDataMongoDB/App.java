@@ -30,17 +30,6 @@ public class App {
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
-		//Inserting
-		/*
-		
-		Persona persona = new Persona();
-		persona.setPaisID(UUID.randomUUID());
-		persona.setFecNacimiento(new Date());
-		persona.setNombre("Juan");
-		persona.setApellidos("PŽrez");
-		mongoOperations.insert(persona);
-		 */
-		
 		//FindByOne
 		/*
 		Persona persona = mongoOperations.findOne(Query.query(Criteria.where("nombre").is("Juan")), Persona.class);
