@@ -23,5 +23,6 @@
 	<bean id="nombreDBWriteConcernResolver" class="informa.apyc.SpringDataMongoDB.writeConcern.DataBaseWriteConcernResolver"/>
 	
 	<mongo:repositories base-package="informa.apyc.SpringDataMongoDB.repositories"/>
+	<context:component-scan base-package="informa.apyc.SpringDataMongoDB.service"/>
 	
 </beans>

@@ -1,51 +1,112 @@
 package informa.apyc.SpringDataMongoDB;
 
-import informa.apyc.SpringDataMongoDB.entities.Persona;
-import informa.apyc.SpringDataMongoDB.repositories.PersonaRepository;
+import informa.apyc.SpringDataMongoDB.entities.Post;
+import informa.apyc.SpringDataMongoDB.entities.Usuario;
+import informa.apyc.SpringDataMongoDB.repositories.PostRepository;
+import informa.apyc.SpringDataMongoDB.repositories.UsuarioRepository;
+import informa.apyc.SpringDataMongoDB.service.PostService;
+
+import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="classpath:META-INF/application-context.xml")
 public class PostRepositoryTest {
 
 	@Autowired
-	PersonaRepository personaRepository;
-	
+	PostRepository postRepository;
+	@Autowired
+	UsuarioRepository usuarioRepository;
+	@Autowired
+	MongoOperations mongoOperations;
+	@Autowired
+	PostService postService;
+
 	@Test
 	public void test() {
 
-		findByNombreContainingPaginado();
+		dropCollections();
+		insertPostConUsuario();
+		insertPostConUsuario2();
+		findAll();
+		findByUsername();
+//		deleteUsuario();
 		
 	}
 
-	private void findByNombreContainingPaginado(){
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private void dropCollections(){
+		mongoOperations.dropCollection(Usuario.class);
+		mongoOperations.dropCollection(Post.class);
+	}
+	
+	private void insertPostConUsuario(){
 		
-		Pageable pageable = new PageRequest(0, 5, Direction.DESC, "nombre");
-		Page<Persona> page = personaRepository.findByNombreContaining("an", pageable );
+		Usuario usuario = new Usuario();
+		usuario.setUsername("pedro");
+		usuario.setPassword("pass");
+		usuarioRepository.save(usuario);
 		
-		System.out.println("Size: " + page.getSize());
-		System.out.println("Number of elements: " + page.getNumberOfElements());
+		Post post = new Post();
+		post.setUsuario(usuario);
+		post.setSubject("Asunto 2");
+		post.setContent("Contenido 2");
+		postService.save(post);
 		
-		System.out.println("Total elementos: " + page.getTotalElements());
-		System.out.println("Total p‡ginas: " + page.getTotalPages());
+	}
+	
+	private void insertPostConUsuario2(){
 		
-		for (Persona persona : page)
-			System.out.println(gson.toJson(persona));
+		Post post = new Post();
+		post.setSubject("Asunto");
+		post.setContent("Contenido");
+		postRepository.save(post);
 		
+		Usuario usuario = new Usuario();
+		usuario.setUsername("angel");
+		usuario.setPassword("angel");
+		usuarioRepository.save(usuario);
+		
+		post.setUsuario(usuario);
+		postRepository.save(post);
+		
+	}
+	
+	private void findAll(){
+		
+		for (Post post : postService.findAll()){
+			System.out.println(new Gson().toJson(post));
+		}
+		
+	}
+	
+	private void deleteUsuario(){
+		
+		Usuario usuario = usuarioRepository.findByUsername("angel");
+		usuarioRepository.delete(usuario);
+		
+		for (Post post : postRepository.findAll()){
+			System.out.println(new Gson().toJson(post));
+		}
+		
+	}
+	
+	private void findByUsername(){
+		
+		Collection<Post> posts = postService.findPostByUsername("angel");
+		
+		System.out.println("Encontrados "+posts.size()+ " temas para el usuario");
+		
+		for (Post post : posts){
+			System.out.println(new Gson().toJson(post));
+		}
 		
 	}
 	
